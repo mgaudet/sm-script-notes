@@ -134,15 +134,3 @@ Q: What about 'Native' code?
 ## Useful References: 
 
 * [Bug 678037 (LazyBytecode)](https://bugzilla.mozilla.org/show_bug.cgi?id=678037)
-
-
-## Random Notes:
-
-JSScript is Bytecode: 
-
-* If you don't have script you're either lazy or you're incomplete. 
-
-
-## Projects
-
-* Make it so we can handle null innner function pointers. Cross linking. Parse tree 
