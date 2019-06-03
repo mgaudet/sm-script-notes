@@ -80,6 +80,10 @@ In some circumstances it is possible to throw away the JSScript (bytecode) for a
 
 [relazification]: https://searchfox.org/mozilla-central/rev/7556a400affa9eb99e522d2d17c40689fa23a729/js/src/vm/JSFunction.cpp#1555-1556
 
+#### Assorted Parser notes
+
+* [This comment](https://searchfox.org/mozilla-central/source/js/src/frontend/Parser.h#13) is an excellent summary of the class hierarchy behind the parser. 
+
 ### Bytecode Emission
 
 
@@ -125,8 +129,6 @@ Q: What about 'Native' code?
   * Has-a GlobalSharedContext, and holds onto the ScriptSourceObject via inheritance from BytecodeCompiler 
 * What is the division of responsiblities between JSFunction and JSScript?
 * What is a closed over binding? 
-* How to build a function tree
-  * What lifetime would function trees have? Ted thinks parse tree would be inside functions
 * Why do we emit in infix order, and how do we... not?
 * When is the 'end' of parsing; for link steps 
 
