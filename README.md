@@ -72,6 +72,16 @@ This is because lazy parsed FunctionNodes don't get a `body()`.
 
 Lazy parsed functions get `JSFunctions` created for them, and an associated `LazyScript` which holds the information required to generate bytecode should the `JSFunction` get invoked. The process of taking a lazy `JSFunction` and creating bytecode for it before execution (or inspection) is called delazification. 
 
+##### Syntax Only Parsing
+
+The parser is [parameterized at certain levels in its inheritance hierarchy](https://searchfox.org/mozilla-central/rev/9eb2f739c165b4e294929f7b99fbb4d90f8a396b/js/src/frontend/Parser.h#54-65,101-111) to distinguish between a full parse and a syntax only parse. 
+
+In a FullParse parser, nodes in the parse tree are full structs, holding on to sufficient information to produce bytecode. 
+
+In a SyntaxOnly parser, nodes in the parse tree are simply enum values. This is sufficient to produce the required syntax errors of a lazy parse.
+
+It's worth noting that not all failures to syntax parse indicate an unparsable script. There are some constructs that the SyntaxOnly parser has insufficient information to resolve, and so in those circumstances we must fall back to a full parse. 
+
 #### Relazification 
 
 In some circumstances it is possible to throw away the JSScript (bytecode) for a JSFunction, and return to being a Lazy JSFunction. This process is referred to as relazification. 
@@ -120,8 +130,6 @@ using JSNative = bool (*)(JSContext* cx, unsigned argc, JS::Value* vp);
 
 In the case of lambdas, there's a 'canonical' JSFunction, which corresponds to its origin, and then new copies are created at various invokation points (Correct?). The original JSFunction, the canonical one, holds the JSScript. The Canonical function is the one allocated by the Front end. 
 
-Q: What about 'Native' code? 
-
 
 ## Questions, so many questions:
 
@@ -130,7 +138,9 @@ Q: What about 'Native' code?
 * What is the division of responsiblities between JSFunction and JSScript?
 * What is a closed over binding? 
 * Why do we emit in infix order, and how do we... not?
-* When is the 'end' of parsing; for link steps 
+* When is the 'end' of parsing?
+* Do FunctionBoxes outlive a parser, or do they too die when the parser dies? 
+
 
 
 ## Useful References: 
