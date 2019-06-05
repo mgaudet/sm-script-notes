@@ -130,6 +130,14 @@ using JSNative = bool (*)(JSContext* cx, unsigned argc, JS::Value* vp);
 
 In the case of lambdas, there's a 'canonical' JSFunction, which corresponds to its origin, and then new copies are created at various invokation points (Correct?). The original JSFunction, the canonical one, holds the JSScript. The Canonical function is the one allocated by the Front end. 
 
+## Parsing + Bytecode Emission + Garbage Collection
+
+The parser currently interacts with the garbage collector because it allocates collected types. 
+
+1. `JSFunctions` 
+2. Regular Expression Objects. 
+3. BigInts
+4. Atoms
 
 ## Questions & Some Answers
 
