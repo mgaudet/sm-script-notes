@@ -9,7 +9,9 @@ In the beginning, there is source.
 
 ## Source to Executable
 
-We start by [parsing into a parse tree][pt], then converting [the parse tree into bytecode][bc]
+We start by [parsing into a parse tree][pt], then converting [the parse tree into bytecode][bc]. 
+
+Overall, our parsing and bytecode emission are quite strongly coupled (which is one of the aspects that makes the parser complciated). In my notes I will attempt to distinguish between the parser and bytecode compilers, however, the code sometimes muddles this distinction. 
 
 [pt]: https://searchfox.org/mozilla-central/rev/7556a400affa9eb99e522d2d17c40689fa23a729/js/src/frontend/BytecodeCompiler.cpp#531-539
 [bc]: https://searchfox.org/mozilla-central/rev/7556a400affa9eb99e522d2d17c40689fa23a729/js/src/frontend/BytecodeCompiler.cpp#555-557. 
@@ -90,11 +92,23 @@ In some circumstances it is possible to throw away the JSScript (bytecode) for a
 
 [relazification]: https://searchfox.org/mozilla-central/rev/7556a400affa9eb99e522d2d17c40689fa23a729/js/src/vm/JSFunction.cpp#1555-1556
 
+#### Parser Interfaces of Note
+
+The parser has a lot of entry points. Some notable ones: 
+
+* [`ListNode* Parser<FullParseHandler, Unit>::globalBody`](https://searchfox.org/mozilla-central/rev/9eb2f739c165b4e294929f7b99fbb4d90f8a396b/js/src/frontend/Parser.cpp#1423) called from [`JSScript* frontend::ScriptCompiler<Unit>::compileScript`](https://searchfox.org/mozilla-central/rev/9eb2f739c165b4e294929f7b99fbb4d90f8a396b/js/src/frontend/BytecodeCompiler.cpp#516)
+* [`frontend::CompileLazyFunction`](https://searchfox.org/mozilla-central/rev/9eb2f739c165b4e294929f7b99fbb4d90f8a396b/js/src/frontend/BytecodeCompiler.cpp#1015,1020) (which in turn calls [`standaloneLazyFunction`](https://searchfox.org/mozilla-central/rev/9eb2f739c165b4e294929f7b99fbb4d90f8a396b/js/src/frontend/BytecodeCompiler.cpp#973))
+
 #### Assorted Parser notes
 
 * [This comment](https://searchfox.org/mozilla-central/source/js/src/frontend/Parser.h#13) is an excellent summary of the class hierarchy behind the parser. 
 
 ### Bytecode Emission
+
+
+### Compilation Interfaces of Note: 
+
+* [`JSScript* frontend::ScriptCompiler<Unit>::compileScript`](https://searchfox.org/mozilla-central/rev/9eb2f739c165b4e294929f7b99fbb4d90f8a396b/js/src/frontend/BytecodeCompiler.cpp#516)
 
 
 ### A tour through function related types in SpiderMonkey
