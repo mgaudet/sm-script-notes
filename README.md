@@ -131,18 +131,26 @@ using JSNative = bool (*)(JSContext* cx, unsigned argc, JS::Value* vp);
 In the case of lambdas, there's a 'canonical' JSFunction, which corresponds to its origin, and then new copies are created at various invokation points (Correct?). The original JSFunction, the canonical one, holds the JSScript. The Canonical function is the one allocated by the Front end. 
 
 
-## Questions, so many questions:
+## Questions & Some Answers
 
 * Why is `GlobalScriptInfo` a `BytecodeCompiler` subclass? 
   * Has-a GlobalSharedContext, and holds onto the ScriptSourceObject via inheritance from BytecodeCompiler 
 * What is the division of responsiblities between JSFunction and JSScript?
 * What is a closed over binding? 
+  * `var x; function f() { ... x ... }` - variables used in a sub-function. 
+  * `noteDeclaredName` and `noteUsedName` are used to compute closed over bindings. 
+  * "`noteUsedName` and friends manipulate the `UsedNameTracke`r class, and then `handler_.finishLexicalScope` finalizes a scope and figures out what variables are in that scope, then the BytecodeEmitter computes where variables are"
 * Why do we emit in infix order, and how do we... not?
+  * One big reason has to do with the 2 pass compilation model we have, with parsing and emission being the only two real passes. 
 * When is the 'end' of parsing?
 * Do FunctionBoxes outlive a parser, or do they too die when the parser dies? 
-
+  * No, the function box dies. The information it has collected is forwarded onto either the script, the function, or the lazy script. 
 
 
 ## Useful References: 
 
 * [Bug 678037 (LazyBytecode)](https://bugzilla.mozilla.org/show_bug.cgi?id=678037)
+
+## Thanks
+
+Thanks to Ashley, Ted, Jeff for their help!
