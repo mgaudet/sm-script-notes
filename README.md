@@ -80,7 +80,9 @@ The parser is [parameterized at certain levels in its inheritance hierarchy](htt
 
 In a FullParse parser, nodes in the parse tree are full structs, holding on to sufficient information to produce bytecode. 
 
-In a SyntaxOnly parser, nodes in the parse tree are simply enum values. This is sufficient to produce the required syntax errors of a lazy parse.
+In a SyntaxOnly parser, nodes in the parse tree are simply enum values. This is sufficient to produce the required syntax errors of a lazy parse. 
+
+At the end of `PerHandlerParser<SyntaxParseHandler>::finishFunction`, a LazyScript is allocated to ensure we can generate a full parse of this function when we execute. 
 
 It's worth noting that not all failures to syntax parse indicate an unparsable script. There are some constructs that the SyntaxOnly parser has insufficient information to resolve, and so in those circumstances we must fall back to a full parse. 
 
@@ -167,6 +169,8 @@ The parser currently interacts with the garbage collector because it allocates c
 * When is the 'end' of parsing?
 * Do FunctionBoxes outlive a parser, or do they too die when the parser dies? 
   * No, the function box dies. The information it has collected is forwarded onto either the script, the function, or the lazy script. 
+* If the top level function of a nested tree of functions is lazily parsed, do all the inner functions get JSFunctions and LazyScripts, or only the top most LazyScript? 
+
 
 
 ## Useful References: 
