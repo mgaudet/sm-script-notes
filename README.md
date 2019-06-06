@@ -118,6 +118,7 @@ The parser has a lot of entry points. Some notable ones:
 * `FunctionNode`: Parser representation of a function definition. Body may be null if lazily parsed. 
 * `FunctionBox`: A `SharedContext` struct, pointed to by a `FunctionNode`, which holds a reference to an allocated `JSFunction`
 * `JSFunction`: A runtime representation of a Javascript function; invokable
+  * `FunctionExtended` is a subclass of JSFunction that has two additional extended slots, used for saving extra information for specific variants of `JSFunction` (ie. arrow functions, methods, WASM and ASMJS functions). These get allocated with the `allocKind` of `FUNCTION_EXTENDED`. 
 * `JSScript`: Bytecode used for execution on the JSVM 
 * `LazyScript`: The information required to cook up bytecode for a JSFunction after a syntax only parse  
 
