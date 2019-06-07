@@ -156,6 +156,16 @@ The parser currently interacts with the garbage collector because it allocates c
 3. BigInts
 4. Atoms
 
+### Keeping Allocated objects alive
+
+* RegEx objects are held onto by an `ObjectBox`. 
+* `JSFunction`s are held onto by `FunctionBox`, which is (in addition to being a subclass of `SharedContext`) a subclass of `ObjectBox`. 
+* BigInts are held onto by `BigIntBox`. 
+
+The three objects above all inherit from TraceListNode, which provides a list for the GC to trace when collecting. It's the parser equivalent of `Rooted`. 
+
+Atoms are kept alive by an `AutoKeepAtoms` that is a member of the Parser. 
+
 ## Questions & Some Answers
 
 * Why is `GlobalScriptInfo` a `BytecodeCompiler` subclass? 
