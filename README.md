@@ -147,6 +147,16 @@ using JSNative = bool (*)(JSContext* cx, unsigned argc, JS::Value* vp);
 
 In the case of lambdas, there's a 'canonical' JSFunction, which corresponds to its origin, and then new copies are created at various invokation points (Correct?). The original JSFunction, the canonical one, holds the JSScript. The Canonical function is the one allocated by the Front end. 
 
+#### `JSScript` 
+
+##### SharedScriptData
+
+This is data that can be shared by many scripts across a runtime. 
+
+##### PrivateScriptData
+
+Holds data private to a single script. Stored as a header object + trailing array. 
+
 ## Parsing + Garbage Collection
 
 
@@ -171,6 +181,8 @@ Atoms are kept alive by an `AutoKeepAtoms` that is a member of the Parser.
 
 During bytecode emission, the references to all our [emitted objects are compacted into a table](https://searchfox.org/mozilla-central/rev/fe7dbedf223c0fc4b37d5bd72293438dfbca6cec/js/src/frontend/BytecodeSection.cpp#45)
 
+Object Box objects end up in `PrivateScriptData`. 
+
 ### Parser Realm 
 
 Objects allocated in the parser are allocated in the Parser realm. At the end of a parse, objects created during the parse must be transferred from the parser realm to the desired destination realm. This is accomplished via a fairly complicated helper called [`mergeRealms`](https://searchfox.org/mozilla-central/rev/fe7dbedf223c0fc4b37d5bd72293438dfbca6cec/js/src/gc/GC.cpp#8228-8374). 
@@ -182,7 +194,6 @@ Bytecode emission also creates GC things. A non-exhaustive list includes
 * Scopes
 * Template Objeccts (for `JSOP_NEWOBJECT`)
 * Module Objects
-
 
 ## Questions & Some Answers
 
