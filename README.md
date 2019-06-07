@@ -177,6 +177,11 @@ Objects allocated in the parser are allocated in the Parser realm. At the end of
 
 ## Bytecode Emission + GC 
 
+Bytecode emission also creates GC things. A non-exhaustive list includes 
+
+* Scopes
+* Template Objeccts (for `JSOP_NEWOBJECT`)
+* Module Objects
 
 
 ## Questions & Some Answers
