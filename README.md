@@ -147,7 +147,8 @@ using JSNative = bool (*)(JSContext* cx, unsigned argc, JS::Value* vp);
 
 In the case of lambdas, there's a 'canonical' JSFunction, which corresponds to its origin, and then new copies are created at various invokation points (Correct?). The original JSFunction, the canonical one, holds the JSScript. The Canonical function is the one allocated by the Front end. 
 
-## Parsing + Bytecode Emission + Garbage Collection
+## Parsing + Garbage Collection
+
 
 The parser currently interacts with the garbage collector because it allocates collected types. 
 
@@ -174,6 +175,9 @@ During bytecode emission, the references to all our [emitted objects are compact
 
 Objects allocated in the parser are allocated in the Parser realm. At the end of a parse, objects created during the parse must be transferred from the parser realm to the desired destination realm. This is accomplished via a fairly complicated helper called [`mergeRealms`](https://searchfox.org/mozilla-central/rev/fe7dbedf223c0fc4b37d5bd72293438dfbca6cec/js/src/gc/GC.cpp#8228-8374). 
 
+## Bytecode Emission + GC 
+
+
 
 ## Questions & Some Answers
 
@@ -190,7 +194,7 @@ Objects allocated in the parser are allocated in the Parser realm. At the end of
 * Do FunctionBoxes outlive a parser, or do they too die when the parser dies? 
   * No, the function box dies. The information it has collected is forwarded onto either the script, the function, or the lazy script. 
 * If the top level function of a nested tree of functions is lazily parsed, do all the inner functions get JSFunctions and LazyScripts, or only the top most LazyScript? 
-
+* Are the objects allocated during parser emission allocated into the parser realm, and merge-realm'd, or are they allocated directly into the correct realm? 
 
 
 ## Useful References: 
