@@ -166,6 +166,15 @@ The three objects above all inherit from TraceListNode, which provides a list fo
 
 Atoms are kept alive by an `AutoKeepAtoms` that is a member of the Parser. 
 
+### Reference Compation
+
+During bytecode emission, the references to all our [emitted objects are compacted into a table](https://searchfox.org/mozilla-central/rev/fe7dbedf223c0fc4b37d5bd72293438dfbca6cec/js/src/frontend/BytecodeSection.cpp#45)
+
+### Parser Realm 
+
+Objects allocated in the parser are allocated in the Parser realm. At the end of a parse, objects created during the parse must be transferred from the parser realm to the desired destination realm. This is accomplished via a fairly complicated helper called [`mergeRealms`](https://searchfox.org/mozilla-central/rev/fe7dbedf223c0fc4b37d5bd72293438dfbca6cec/js/src/gc/GC.cpp#8228-8374). 
+
+
 ## Questions & Some Answers
 
 * Why is `GlobalScriptInfo` a `BytecodeCompiler` subclass? 
