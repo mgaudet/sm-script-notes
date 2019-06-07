@@ -211,6 +211,7 @@ Bytecode emission also creates GC things. A non-exhaustive list includes
   * No, the function box dies. The information it has collected is forwarded onto either the script, the function, or the lazy script. 
 * If the top level function of a nested tree of functions is lazily parsed, do all the inner functions get JSFunctions and LazyScripts, or only the top most LazyScript? 
 * Are the objects allocated during parser emission allocated into the parser realm, and merge-realm'd, or are they allocated directly into the correct realm? 
+* Why does `JSScript` store `sourceStart_`, `sourceEnd_` etc?
 
 
 ## Useful References: 
