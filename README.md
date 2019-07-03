@@ -143,6 +143,11 @@ JSFunction can be thought of as a variant over JSScript, LazyScript and Native.
 using JSNative = bool (*)(JSContext* cx, unsigned argc, JS::Value* vp);
 ```
 
+##### GC and Ownership
+
+* In the lazy case, the LazyScript holds on to the associated JSFunction, and traces it for GC purposes. It is through the LazyScript that the function is obtained for delazification.
+
+
 ##### Canonical Functions
 
 In the case of lambdas, there's a 'canonical' JSFunction, which corresponds to its origin, and then new copies are created at various invokation points (Correct?). The original JSFunction, the canonical one, holds the JSScript. The Canonical function is the one allocated by the Front end. 
