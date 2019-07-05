@@ -35,7 +35,7 @@ function List() {
 MakeConstructible(List, {__proto__: null});
 ```
 
-becomes 
+becomes (call `ParseNode::dump()`)
 
 ```
 (StatementList [(VarStmt [(AssignExpr std_Symbol
@@ -61,7 +61,7 @@ As described in [this comment][comment] ParseNodes live only as long as the pars
 
 Lazy Parsing is a solution to the empirical fact that an appreciable fraction of the JS downloaded into a browser isn't actually executed in a given session. Imagine the broad range of functionality required in a web app, and the narrow path an average session would go across. 
 
-In order to handle this, SpiderMonkey has what's called Lazy parsing. Lazy parsing will syntax parse a function, as there are certain errors that are required to be reported eagerly, but will not generate a full parse tree. In the parse tree dump a lazy parsed function shows up as `#NULL`: 
+In order to handle this, SpiderMonkey has what's called Lazy parsing. Lazy parsing will syntax parse a function, as there are certain errors that are required to be reported eagerly, but will not generate a full parse tree. In the parse tree dump  a lazy parsed function shows up as `#NULL`:
 
 ```
 (StatementList [(Function #NULL)
