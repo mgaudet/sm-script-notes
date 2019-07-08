@@ -11,7 +11,7 @@ In the beginning, there is source.
 
 We start by [parsing into a parse tree][pt], then converting [the parse tree into bytecode][bc]. 
 
-Overall, our parsing and bytecode emission are quite strongly coupled (which is one of the aspects that makes the parser complciated). In my notes I will attempt to distinguish between the parser and bytecode compilers, however, the code sometimes muddles this distinction. 
+Overall, our parsing and bytecode emission are quite strongly coupled (which is one of the aspects that makes the parser complicated). In my notes I will attempt to distinguish between the parser and bytecode compilers, however, the code sometimes muddles this distinction. 
 
 [pt]: https://searchfox.org/mozilla-central/rev/7556a400affa9eb99e522d2d17c40689fa23a729/js/src/frontend/BytecodeCompiler.cpp#531-539
 [bc]: https://searchfox.org/mozilla-central/rev/7556a400affa9eb99e522d2d17c40689fa23a729/js/src/frontend/BytecodeCompiler.cpp#555-557. 
@@ -150,7 +150,7 @@ using JSNative = bool (*)(JSContext* cx, unsigned argc, JS::Value* vp);
 
 ##### Canonical Functions
 
-In the case of lambdas, there's a 'canonical' JSFunction, which corresponds to its origin, and then new copies are created at various invokation points (Correct?). The original JSFunction, the canonical one, holds the JSScript. The Canonical function is the one allocated by the Front end. 
+In the case of lambdas, there's a 'canonical' JSFunction, which corresponds to its origin, and then new copies are created at various invocation points (Correct?). The original JSFunction, the canonical one, holds the JSScript. The Canonical function is the one allocated by the Front end. 
 
 #### `JSScript` 
 
@@ -182,7 +182,7 @@ The three objects above all inherit from TraceListNode, which provides a list fo
 
 Atoms are kept alive by an `AutoKeepAtoms` that is a member of the Parser. 
 
-### Reference Compation
+### Reference Compaction
 
 During bytecode emission, the references to all our [emitted objects are compacted into a table](https://searchfox.org/mozilla-central/rev/fe7dbedf223c0fc4b37d5bd72293438dfbca6cec/js/src/frontend/BytecodeSection.cpp#45)
 
@@ -197,14 +197,14 @@ Objects allocated in the parser are allocated in the Parser realm. At the end of
 Bytecode emission also creates GC things. A non-exhaustive list includes 
 
 * Scopes
-* Template Objeccts (for `JSOP_NEWOBJECT`)
+* Template Objects (for `JSOP_NEWOBJECT`)
 * Module Objects
 
 ## Questions & Some Answers
 
 * Why is `GlobalScriptInfo` a `BytecodeCompiler` subclass? 
   * Has-a GlobalSharedContext, and holds onto the ScriptSourceObject via inheritance from BytecodeCompiler 
-* What is the division of responsiblities between JSFunction and JSScript?
+* What is the division of responsibilities between JSFunction and JSScript?
 * What is a closed over binding? 
   * `var x; function f() { ... x ... }` - variables used in a sub-function. 
   * `noteDeclaredName` and `noteUsedName` are used to compute closed over bindings. 
@@ -217,6 +217,7 @@ Bytecode emission also creates GC things. A non-exhaustive list includes
 * If the top level function of a nested tree of functions is lazily parsed, do all the inner functions get JSFunctions and LazyScripts, or only the top most LazyScript? 
 * Are the objects allocated during parser emission allocated into the parser realm, and merge-realm'd, or are they allocated directly into the correct realm? 
 * Why does `JSScript` store `sourceStart_`, `sourceEnd_` etc?
+* During delazification we create a FunctionBox to hold the already existing JSFunction (`initFromLazyFunction`). I noticed this when investigating a problem and realized that the mapping between FunctionBoxes and JSFunctions isn't 1-1, as you get multiple FunctionBoxes that point to the same JSFunction. Conceptually what does this mean? 
 
 
 ## Useful References: 
