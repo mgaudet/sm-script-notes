@@ -105,9 +105,6 @@ The parser has a lot of entry points. Some notable ones:
 
 * [This comment](https://searchfox.org/mozilla-central/source/js/src/frontend/Parser.h#13) is an excellent summary of the class hierarchy behind the parser. 
 
-### Bytecode Emission
-
-
 ### Compilation Interfaces of Note: 
 
 * [`JSScript* frontend::ScriptCompiler<Unit>::compileScript`](https://searchfox.org/mozilla-central/rev/9eb2f739c165b4e294929f7b99fbb4d90f8a396b/js/src/frontend/BytecodeCompiler.cpp#516)
@@ -192,7 +189,27 @@ Object Box objects end up in `PrivateScriptData`.
 
 Objects allocated in the parser are allocated in the Parser realm. At the end of a parse, objects created during the parse must be transferred from the parser realm to the desired destination realm. This is accomplished via a fairly complicated helper called [`mergeRealms`](https://searchfox.org/mozilla-central/rev/fe7dbedf223c0fc4b37d5bd72293438dfbca6cec/js/src/gc/GC.cpp#8228-8374). 
 
-## Bytecode Emission + GC 
+## Bytecode Emission 
+
+A high level overview of Bytecode Emission (Ignoring a lot of special cases) 
+
+1. Kickoff seems to be [`BytecodeEmitter::emitScript`](https://searchfox.org/mozilla-central/rev/da3f3eaaacb6fb344fd21ac29ace2da0e33f12d3/js/src/frontend/BytecodeCompiler.cpp#539). 
+2. After setting up scoping rules etc, [`emitTree`](https://searchfox.org/mozilla-central/rev/da3f3eaaacb6fb344fd21ac29ace2da0e33f12d3/js/src/frontend/BytecodeEmitter.cpp#2452) is called. `emitTree` knows how to emit each parse node kind, as well as walk over list-types. (Since a high level representation of a function body is a `StatmentList`, this naturally works out. 
+3. A `JSOP_RETVAL` is emitted
+4. [Names are provided to anonymous functions rooted at this parse tree](https://searchfox.org/mozilla-central/rev/da3f3eaaacb6fb344fd21ac29ace2da0e33f12d3/js/src/frontend/BytecodeEmitter.cpp#2472-2474)
+5. [We initialize the script from the emitter](https://searchfox.org/mozilla-central/rev/da3f3eaaacb6fb344fd21ac29ace2da0e33f12d3/js/src/frontend/BytecodeEmitter.cpp#2476-2478); this consists of: 
+  - Setting [immutable script flags from the emitter](https://searchfox.org/mozilla-central/rev/da3f3eaaacb6fb344fd21ac29ace2da0e33f12d3/js/src/vm/JSScript.cpp#3985-3996) 
+  - Pulling flags off of the `FunctionBox`
+  - Initializing the `PrivateScriptData`
+  	 - This is where the [GC things are copied out of the emitter into the `PrivateScriptData`](https://searchfox.org/mozilla-central/rev/da3f3eaaacb6fb344fd21ac29ace2da0e33f12d3/js/src/vm/JSScript.cpp#3685-3687) 
+  - Initializing the `SharedScriptData` 
+  - Shared script data is deduplicated by the `ScriptDataTable`
+  - If the shared context behind the `BytecodeEmitter` being used to generate this script is a `FunctionBox` (When it's not, it must be a Module, I believe), the function is informed of the script.
+  - All the inner functions pointed to by the per-script data have their enclosing scope set.
+6. Finally, we tell the Debugger about the script. 
+
+  
+### GC Notes
 
 Bytecode emission also creates GC things. A non-exhaustive list includes 
 
@@ -211,7 +228,6 @@ Bytecode emission also creates GC things. A non-exhaustive list includes
   * "`noteUsedName` and friends manipulate the `UsedNameTracke`r class, and then `handler_.finishLexicalScope` finalizes a scope and figures out what variables are in that scope, then the BytecodeEmitter computes where variables are"
 * Why do we emit in infix order, and how do we... not?
   * One big reason has to do with the 2 pass compilation model we have, with parsing and emission being the only two real passes. 
-* When is the 'end' of parsing?
 * Do FunctionBoxes outlive a parser, or do they too die when the parser dies? 
   * No, the function box dies. The information it has collected is forwarded onto either the script, the function, or the lazy script. 
 * If the top level function of a nested tree of functions is lazily parsed, do all the inner functions get JSFunctions and LazyScripts, or only the top most LazyScript? 
