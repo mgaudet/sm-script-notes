@@ -1,5 +1,7 @@
 # How functions live and die in SpiderMonkey
 
+**NOTE (Feb 20, 2020): This code has been under very active development, and so these notes no longer reflect all of reality**
+
 In the beginning, there is source. 
 
 ## Source Representation
